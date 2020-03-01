@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.hero.mapper.BoardMapper">
+
+    <select id="getList" resultType="org.hero.domain.BoardVO">
+        <![CDATA[select * from tb1_board where bno > 0]]>
+    </select>
+
+    <insert id="insert">
+        insert into tb1_board(title,content,writer)
+        values (#{title},#{content},#{writer})
+    </insert>
+
+    <insert id="insertSelectKey">
+        <selectKey keyProperty="bno" order="BEFORE" resultType="long">
+            select max(bno)+1 from tb1_board;
+        </selectKey>
+
+        insert into tb1_board(bno,title,content,writer)
+        values (#{bno},#{title},#{content},#{writer})
+    </insert>
+
+    <select id="read" resultType="org.hero.domain.BoardVO">
+        <include refid="testRead"/>
+        <![CDATA[
+        where bno = #{bno}
+        ]]>
+    </select>
+
+    <delete id="delete">
+        delete from tb1_board where bno = #{bno}
+    </delete>
+
+    <update id="update">
+        update tb1_board
+        set title = #{title},content = #{content},writer=#{writer},updateDate = CURRENT_TIMESTAMP where bno = #{bno}
+    </update>
+
+    <select id="getListWithPaging" resultType="org.hero.domain.BoardVO">
+        <![CDATA[
+            select bno,title,content,writer,regdate,updateDate
+            from tb1_board where bno>0
+            ]]>
+            <include refid="search"/>
+            <![CDATA[
+            order by bno desc,regdate desc
+            limit #{pageStart},#{amount}
+            ]]>
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        <![CDATA[
+        select count(*) from tb1_board where bno > 0
+        ]]>
+    </select>
+
+    <select id="getSearchedCount" resultType="int">
+        <![CDATA[
+        select count(bno) from tb1_board where bno>0 ]]>
+        <include refid="search"/>
+    </select>
+
+    <sql id="testRead">
+        <![CDATA[
+        select * from tb1_board
+        ]]>
+    </sql>
+
+    <sql id="search">
+        <if test="type != null">
+            <if test="type == 'T'.toString()">
+                <![CDATA[
+                AND title LIKE CONCAT('%',#{keyword},'%')
+                ]]>
+            </if>
+            <if test="type == 'C'.toString()">
+                <![CDATA[
+                AND content LIKE CONCAT('%',#{keyword},'%')
+                ]]>
+            </if>
+            <if test="type == 'W'.toString()">
+                <![CDATA[
+                AND writer LIKE CONCAT('%',#{keyword},'%')
+                ]]>
+            </if>
+            <if test="type == 'TC'.toString()">
+                <![CDATA[
+                AND(title LIKE CONCAT('%',#{keyword},'%')
+                    OR content LIKE CONCAT('%',#{keyword},'%')
+                    )
+                ]]>
+            </if>
+            <if test="type == 'TW'.toString()">
+                <![CDATA[
+                AND(title LIKE CONCAT('%',#{keyword},'%')
+                    OR writer LIKE CONCAT('%',#{keyword},'%')
+                    )
+                 ]]>
+            </if>
+            <if test="type == 'TWC'.toString()">
+                <![CDATA[
+                AND(title LIKE CONCAT('%',#{keyword},'%')
+                    OR content LIKE CONCAT('%',#{keyword},'%')
+                    OR writer LIKE CONCAT('%',#{keyword},'%')
+                    )
+                ]]>
+            </if>
+        </if>
+    </sql>
+</mapper>
