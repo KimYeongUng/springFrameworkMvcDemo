@@ -4,7 +4,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 import org.hero.domain.BoardVO;
 import org.hero.domain.Criteria;
-import org.hero.mapper.BoardMapper;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
